@@ -2,7 +2,7 @@
 
 Angular Onboarding Library
 
-##This is a Work In Progress!
+## This is a Work In Progress!
 
 see [Demo](http://hillmann.cc/ng-welcome/)
 
