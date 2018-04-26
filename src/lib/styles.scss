@@ -1,0 +1,21 @@
+@mixin onboarding() {
+	.onboarding-element {
+		position: relative;
+		z-index: 999;
+	}
+
+	.onboarding-backdrop {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.25);
+		z-index: 998;
+	}
+
+	.onboarding-pane {
+		position: absolute;
+		z-index: 1000;
+	}
+}
