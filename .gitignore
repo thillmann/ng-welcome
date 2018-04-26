@@ -5,6 +5,7 @@
 /dist-server
 /tmp
 /out-tsc
+dist.tgz
 
 # dependencies
 /node_modules
@@ -20,10 +21,12 @@
 
 # IDE - VSCode
 .vscode/*
+.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.prettierrc
 
 # misc
 /.sass-cache
