@@ -31,25 +31,26 @@ export class AppComponent {
 		const onboarding = this.onboarding.start({
 			steps: [
 				{
-					template: this.step2Ref,
+					content: this.step2Ref,
 					attachTo: this.linkRef,
 					position: 'top',
-					offsetY: -20
+					offsetY: -20,
+					data: 'Test'
 				},
 				{
-					template: this.step1Ref,
+					content: this.step1Ref,
 					attachTo: this.imageRef,
 					position: 'right',
 					offsetX: 20
 				},
 				{
-					template: this.step3Ref,
+					content: this.step3Ref,
 					attachTo: this.titleRef,
 					position: 'bottom',
 					offsetY: 20
 				},
 				{
-					template: this.step4Ref
+					content: this.step4Ref
 				}
 			],
 			viewContainerRef: this.viewContainerRef,
