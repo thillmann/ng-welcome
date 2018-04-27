@@ -1,3 +1,4 @@
+export * from './onboarding-data';
 export * from './onboarding-config';
 export * from './onboarding-animation';
 export * from './onboarding-step';

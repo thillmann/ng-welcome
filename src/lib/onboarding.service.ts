@@ -6,7 +6,8 @@ import {
 	ComponentFactoryResolver,
 	EmbeddedViewRef,
 	NgZone,
-	ViewContainerRef
+	ViewContainerRef,
+	Optional
 } from '@angular/core';
 import {
 	Overlay,
@@ -16,10 +17,11 @@ import {
 	OverlayConnectionPosition,
 	PositionStrategy,
 	OverlayKeyboardDispatcher,
-	OverlayPositionBuilder
+	OverlayPositionBuilder,
+	BlockScrollStrategy,
+	ViewportRuler
 } from '@angular/cdk/overlay';
 import {
-	PortalInjector,
 	TemplatePortal,
 	ComponentPortal,
 	DomPortalOutlet,
@@ -29,7 +31,7 @@ import {
 } from '@angular/cdk/portal';
 import { OnboardingConfig, OnboardingStepConfig } from './onboarding-config';
 import { OnboardingContainer } from './onboarding-container';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 import { Subject } from 'rxjs/Subject';
 import { take } from 'rxjs/operators/take';
 import { Observable } from 'rxjs/Observable';
@@ -74,7 +76,9 @@ export class Onboarding {
 		private injector: Injector,
 		private ngZone: NgZone,
 		private keyboardDispatcher: OverlayKeyboardDispatcher,
-		private position: OverlayPositionBuilder
+		private viewportRuler: ViewportRuler,
+		private position: OverlayPositionBuilder,
+		@Optional() private location: Location
 	) {}
 
 	private createHostElement(): HTMLElement {
@@ -91,11 +95,6 @@ export class Onboarding {
 
 	private createPortalOutlet(pane: HTMLElement): DomPortalOutlet {
 		return new DomPortalOutlet(pane, this.componentFactoryResolver, this.appRef, this.injector);
-	}
-
-	private createInjector(): PortalInjector {
-		const injectorTokens = new WeakMap();
-		return new PortalInjector(this.injector, injectorTokens);
 	}
 
 	private getGlobalStrategy(config: OnboardingStepConfig): PositionStrategy {
@@ -123,11 +122,20 @@ export class Onboarding {
 		const positionStrategy = stepConfig.attachTo
 			? this.getAttachedToStrategy(stepConfig)
 			: this.getGlobalStrategy(stepConfig);
+
+		const scrollStrategy = new BlockScrollStrategy(this.viewportRuler, this.document);
 		return new OverlayConfig({
-			hasBackdrop: config.hasBackdrop,
-			backdropClass: 'onboarding-backdrop',
-			positionStrategy
+			hasBackdrop: false,
+			positionStrategy,
+			scrollStrategy
 		});
+	}
+
+	createBackdrop(backdropClass?: string): HTMLElement {
+		const backdrop = this.document.createElement('div');
+		backdrop.classList.add(backdropClass || 'onboarding-backdrop');
+		this.container.getContainerElement().appendChild(backdrop);
+		return backdrop;
 	}
 
 	createOverlay(config: OnboardingConfig, stepConfig: OnboardingStepConfig): OverlayRef {
@@ -146,9 +154,17 @@ export class Onboarding {
 
 	start(config: OnboardingConfig): OnboardingRef {
 		return new OnboardingRef(
-			{ hasBackdrop: true, disableClose: false, ...config },
+			{
+				hasBackdrop: true,
+				disableClose: false,
+				closeOnNavigation: true,
+				nextOnArrowKey: false,
+				...config
+			},
 			this.injector,
-			this
+			this.ngZone,
+			this,
+			this.location
 		);
 	}
 }
