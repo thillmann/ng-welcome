@@ -9,6 +9,8 @@
 		"test": "ng test",
 		"lint": "ng lint",
 		"e2e": "ng e2e",
+		"build:demo":
+			"ng build --prod --base-href \"http://hillmann.cc/ng-welcome/\" --output-path ./docs",
 		"packagr": "ng-packagr -p src/lib/ng-package.json"
 	},
 	"private": true,
