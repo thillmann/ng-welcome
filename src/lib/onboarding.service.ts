@@ -18,8 +18,7 @@ import {
 	PositionStrategy,
 	OverlayKeyboardDispatcher,
 	OverlayPositionBuilder,
-	BlockScrollStrategy,
-	ViewportRuler
+	ScrollStrategyOptions
 } from '@angular/cdk/overlay';
 import {
 	TemplatePortal,
@@ -76,7 +75,7 @@ export class Onboarding {
 		private injector: Injector,
 		private ngZone: NgZone,
 		private keyboardDispatcher: OverlayKeyboardDispatcher,
-		private viewportRuler: ViewportRuler,
+		private scrollStrategies: ScrollStrategyOptions,
 		private position: OverlayPositionBuilder,
 		@Optional() private location: Location
 	) {}
@@ -123,11 +122,11 @@ export class Onboarding {
 			? this.getAttachedToStrategy(stepConfig)
 			: this.getGlobalStrategy(stepConfig);
 
-		const scrollStrategy = new BlockScrollStrategy(this.viewportRuler, this.document);
+		const scrollStrategy = this.scrollStrategies.block();
 		return new OverlayConfig({
 			hasBackdrop: false,
 			positionStrategy,
-			scrollStrategy
+			scrollStrategy: this.scrollStrategies.reposition()
 		});
 	}
 
@@ -159,6 +158,7 @@ export class Onboarding {
 				disableClose: false,
 				closeOnNavigation: true,
 				nextOnArrowKey: false,
+				smoothScroll: true,
 				...config
 			},
 			this.injector,

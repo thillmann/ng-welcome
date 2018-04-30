@@ -1,11 +1,20 @@
 @mixin onboarding() {
+	.onboarding {
+		pointer-events: none;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		position: fixed;
+	}
+
 	.onboarding-element {
 		position: relative;
 		z-index: 999;
 	}
 
 	.onboarding-backdrop {
-		position: absolute;
+		position: fixed;
 		top: 0;
 		left: 0;
 		width: 100%;

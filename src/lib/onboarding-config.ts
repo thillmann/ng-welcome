@@ -21,4 +21,5 @@ export interface OnboardingConfig {
 	nextOnArrowKey?: boolean;
 	viewContainerRef?: ViewContainerRef;
 	container?: ComponentType<OnboardingStep>;
+	smoothScroll?: boolean;
 }

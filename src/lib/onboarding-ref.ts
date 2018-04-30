@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators/takeUntil';
 import { OnboardingConfig, OnboardingStepConfig } from './onboarding-config';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, TemplatePortal, PortalInjector } from '@angular/cdk/portal';
-import { Injector, ComponentRef, NgZone, TemplateRef } from '@angular/core';
+import { Injector, ComponentRef, NgZone, TemplateRef, ElementRef } from '@angular/core';
 import { SimpleOnboardingStep } from './simple-onboarding-step';
 import { Onboarding } from './onboarding.service';
 import { tap } from 'rxjs/operators/tap';
@@ -19,6 +19,14 @@ const SHOWING_CLASS = 'onboarding-backdrop--showing';
 
 function hasHighlight(config: OnboardingStepConfig): boolean {
 	return config.attachTo && (config.hasHighlight === undefined || config.hasHighlight);
+}
+
+function scrollTo(element: HTMLElement, smoothScroll = true): void {
+	element.scrollIntoView({
+		block: 'end',
+		inline: 'nearest',
+		behavior: smoothScroll ? 'smooth' : 'instant'
+	});
 }
 
 export class OnboardingRef {
@@ -114,7 +122,7 @@ export class OnboardingRef {
 		return this.onboarding.createOverlay(this.config, config);
 	}
 
-	private attachOnboardingStep(config: OnboardingStepConfig): OnboardingStep {
+	private attachOnboardingStep(config: OnboardingStepConfig): void {
 		const overlayRef = this.createOverlay(config);
 		const componentRef: ComponentRef<OnboardingStep> = overlayRef.attach(
 			new ComponentPortal(
@@ -143,6 +151,19 @@ export class OnboardingRef {
 
 		if (hasHighlight(config)) {
 			config.attachTo.nativeElement.classList.add('onboarding-element');
+		}
+
+		if (config.attachTo) {
+			containerInstance.animationStateChanged$
+				.pipe(
+					filter(event => event.phaseName === 'start' && event.toState === 'enter'),
+					take(1)
+				)
+				.subscribe(
+					() =>
+						config.attachTo &&
+						scrollTo(config.attachTo.nativeElement, this.config.smoothScroll)
+				);
 		}
 
 		containerInstance.animationStateChanged$
@@ -187,7 +208,7 @@ export class OnboardingRef {
 				});
 		}
 
-		return containerInstance;
+		this.currentStep = containerInstance;
 	}
 
 	afterOpen$(): Observable<void> {
@@ -248,6 +269,6 @@ export class OnboardingRef {
 		if (this.currentStep) {
 			this.currentStep.startExitAnimation();
 		}
-		this.currentStep = this.attachOnboardingStep(step);
+		this.attachOnboardingStep(step);
 	}
 }
