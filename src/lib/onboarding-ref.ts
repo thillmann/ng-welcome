@@ -34,6 +34,7 @@ export class OnboardingRef {
 	private currentStepIdx = -1;
 	private currentStep: OnboardingStep;
 	private backdropElement: HTMLElement;
+	private elementFocusedBeforeDialogWasOpened: HTMLElement | null = null;
 	private locationChanges: any = Subscription.EMPTY;
 	private afterOpen = new Subject<void>();
 	private beforeClose = new Subject<any>();
@@ -46,6 +47,7 @@ export class OnboardingRef {
 		private injector: Injector,
 		private ngZone: NgZone,
 		private onboarding: Onboarding,
+		private document?: any,
 		private location?: Location
 	) {
 		if (this.config.hasBackdrop) {
@@ -67,6 +69,12 @@ export class OnboardingRef {
 					this.afterOpen.complete();
 				});
 		});
+	}
+
+	private savePreviouslyFocusedElement(): void {
+		if (this.document) {
+			this.elementFocusedBeforeDialogWasOpened = this.document.activeElement as HTMLElement;
+		}
 	}
 
 	private attachBackdrop(): void {
@@ -123,6 +131,7 @@ export class OnboardingRef {
 	}
 
 	private attachOnboardingStep(config: OnboardingStepConfig): void {
+		this.savePreviouslyFocusedElement();
 		const overlayRef = this.createOverlay(config);
 		const componentRef: ComponentRef<OnboardingStep> = overlayRef.attach(
 			new ComponentPortal(
@@ -132,6 +141,9 @@ export class OnboardingRef {
 			)
 		);
 		const containerInstance = componentRef.instance;
+		containerInstance.overlayRef = overlayRef;
+		containerInstance.config = config;
+		containerInstance.onboardingConfig = this.config;
 		if (config.content instanceof TemplateRef) {
 			containerInstance.attachTemplatePortal(
 				new TemplatePortal(config.content, this.config.viewContainerRef, {
@@ -192,7 +204,7 @@ export class OnboardingRef {
 				.subscribe(() => this.close());
 		}
 
-		if (this.config.nextOnArrowKey) {
+		if (this.config.nextOnArrowKeys) {
 			overlayRef
 				.keydownEvents()
 				.pipe(
@@ -250,6 +262,12 @@ export class OnboardingRef {
 				this.currentStep = null;
 				this.onboarding = null;
 				this.injector = null;
+
+				const toFocus = this.elementFocusedBeforeDialogWasOpened;
+				if (toFocus && typeof toFocus.focus === 'function') {
+					toFocus.focus();
+				}
+				this.elementFocusedBeforeDialogWasOpened = null;
 			});
 
 		this.currentStep.startExitAnimation();

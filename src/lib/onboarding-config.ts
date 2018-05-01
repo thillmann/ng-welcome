@@ -18,8 +18,9 @@ export interface OnboardingConfig {
 	backdropClass?: string;
 	disableClose?: boolean;
 	closeOnNavigation?: boolean;
-	nextOnArrowKey?: boolean;
+	nextOnArrowKeys?: boolean;
 	viewContainerRef?: ViewContainerRef;
 	container?: ComponentType<OnboardingStep>;
 	smoothScroll?: boolean;
+	autoFocus?: boolean;
 }

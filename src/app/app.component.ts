@@ -47,7 +47,7 @@ export class AppComponent {
 					content: this.step3Ref,
 					attachTo: this.titleRef,
 					position: 'top',
-					offsetY: 20
+					offsetY: -20
 				},
 				{
 					content: this.step4Ref

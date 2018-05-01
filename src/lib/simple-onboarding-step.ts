@@ -6,6 +6,7 @@ import {
 	ChangeDetectorRef
 } from '@angular/core';
 import { ComponentPortal, TemplatePortal, CdkPortalOutlet } from '@angular/cdk/portal';
+import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
 import { ONBOARDING_ANIMATION } from './onboarding-animation';
 import { OnboardingStep } from './onboarding-step';
 
@@ -23,8 +24,8 @@ import { OnboardingStep } from './onboarding-step';
 export class SimpleOnboardingStep extends OnboardingStep {
 	@ViewChild(CdkPortalOutlet) portalOutlet: CdkPortalOutlet;
 
-	constructor(changeDetectorRef: ChangeDetectorRef) {
-		super(changeDetectorRef);
+	constructor(changeDetectorRef: ChangeDetectorRef, focusTrapFactory: FocusTrapFactory) {
+		super(changeDetectorRef, focusTrapFactory);
 	}
 
 	attachComponentPortal<T>(portal: ComponentPortal<T>): ComponentRef<T> {

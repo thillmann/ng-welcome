@@ -157,13 +157,15 @@ export class Onboarding {
 				hasBackdrop: true,
 				disableClose: false,
 				closeOnNavigation: true,
-				nextOnArrowKey: false,
+				nextOnArrowKeys: false,
 				smoothScroll: true,
+				autoFocus: true,
 				...config
 			},
 			this.injector,
 			this.ngZone,
 			this,
+			this.document,
 			this.location
 		);
 	}
