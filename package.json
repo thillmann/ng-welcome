@@ -9,8 +9,7 @@
 		"test": "ng test",
 		"lint": "ng lint",
 		"e2e": "ng e2e",
-		"build:demo":
-			"ng build --prod --base-href \"http://hillmann.cc/ng-welcome/\" --output-path ./docs",
+		"build:demo": "ng build --prod --base-href \"http://hillmann.cc/ng-welcome/\" --output-path ./docs",
 		"packagr": "ng-packagr -p src/lib/ng-package.json"
 	},
 	"private": true,
@@ -25,15 +24,19 @@
 		"@angular/platform-browser": "^5.2.0",
 		"@angular/platform-browser-dynamic": "^5.2.0",
 		"@angular/router": "^5.2.0",
+		"@ng-bootstrap/ng-bootstrap": "^1.1.2",
+		"bootstrap": "^4.1.0",
+		"chart.js": "^2.7.2",
 		"core-js": "^2.4.1",
+		"ng-welcome": "./dist.tgz",
 		"rxjs": "^5.5.6",
-		"zone.js": "^0.8.19",
-		"ng-welcome": "./dist.tgz"
+		"zone.js": "^0.8.19"
 	},
 	"devDependencies": {
 		"@angular/cli": "~1.7.4",
 		"@angular/compiler-cli": "^5.2.0",
 		"@angular/language-service": "^5.2.0",
+		"@types/chart.js": "^2.7.14",
 		"@types/jasmine": "~2.8.3",
 		"@types/jasminewd2": "~2.0.2",
 		"@types/node": "~6.0.60",
