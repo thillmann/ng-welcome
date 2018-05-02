@@ -50,6 +50,8 @@ export class OnboardingRef {
 		private document?: any,
 		private location?: Location
 	) {
+		this.savePreviouslyFocusedElement();
+
 		if (this.config.hasBackdrop) {
 			this.attachBackdrop();
 		}
@@ -131,7 +133,6 @@ export class OnboardingRef {
 	}
 
 	private attachOnboardingStep(config: OnboardingStepConfig): void {
-		this.savePreviouslyFocusedElement();
 		const overlayRef = this.createOverlay(config);
 		const componentRef: ComponentRef<OnboardingStep> = overlayRef.attach(
 			new ComponentPortal(
@@ -218,6 +219,12 @@ export class OnboardingRef {
 						this.next(true);
 					}
 				});
+		}
+
+		if (config.nextWhen) {
+			const nextWhen$ =
+				typeof config.nextWhen === 'function' ? config.nextWhen() : config.nextWhen;
+			nextWhen$.pipe(take(1)).subscribe(() => this.next());
 		}
 
 		this.currentStep = containerInstance;

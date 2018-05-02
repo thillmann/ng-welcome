@@ -16,6 +16,7 @@ import { OnboardingStep } from './onboarding-step';
 	styleUrls: ['./simple-onboarding-step.scss'],
 	animations: [ONBOARDING_ANIMATION.slideOverlay],
 	host: {
+		tabindex: '-1',
 		'[@slideOverlay]': 'state',
 		'(@slideOverlay.start)': 'onAnimationStart($event)',
 		'(@slideOverlay.done)': 'onAnimationDone($event)'

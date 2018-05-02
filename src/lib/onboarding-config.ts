@@ -1,6 +1,7 @@
 import { ElementRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { PositionStrategy, ComponentType } from '@angular/cdk/overlay';
 import { OnboardingStep } from './onboarding-step';
+import { Observable } from 'rxjs/Observable';
 
 export interface OnboardingStepConfig {
 	content: TemplateRef<any> | ComponentType<any>;
@@ -10,6 +11,7 @@ export interface OnboardingStepConfig {
 	offsetX?: number;
 	offsetY?: number;
 	hasHighlight?: boolean;
+	nextWhen?: () => Observable<any> | Observable<any>;
 }
 
 export interface OnboardingConfig {
