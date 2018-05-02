@@ -152,7 +152,7 @@
             </a>
           </li>
           <li class="d-flex justify-content-center mt-4" *ngIf="onboardingFinished">
-            <button (click)="start()" class="btn btn-primary">Start Onboarding Again</button>
+            <button (click)="start()" class="btn btn-primary start-again">Start Onboarding Again</button>
           </li>
         </ul>
       </div>
@@ -342,6 +342,6 @@
     <button tabindex="1" type="button" class="btn btn-link" (click)="onboarding.close()">Skip</button>
   </p>
 </ng-template>
-<ngb-alert type="info" [dismissible]="true" class="alert" (close)="showAlert = false" *ngIf="onboardingResult && showAlert">
+<ngb-alert type="info" [dismissible]="true" class="finished-alert" (close)="showAlert = false" *ngIf="onboardingResult && showAlert">
   <strong>Finished</strong> Enjoy the product!
 </ngb-alert>

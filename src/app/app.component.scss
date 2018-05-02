@@ -64,14 +64,33 @@
 	}
 }
 
-canvas {
-	background: #fff;
-	height: 50vh;
+.chart {
+	width: 100%;
+	overflow-x: auto;
+	canvas {
+		background: #fff;
+		height: 50vh;
+	}
 }
 
-.alert {
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.finished-alert {
 	position: fixed;
 	top: 20px;
 	left: 20px;
 	z-index: 10000;
+	animation: fadeIn 200ms;
+	font-size: 1rem;
+}
+
+.start-again {
+	animation: fadeIn 200ms;
 }
