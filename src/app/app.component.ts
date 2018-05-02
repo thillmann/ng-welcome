@@ -95,7 +95,7 @@ export class AppComponent implements AfterViewInit {
 		this.chartRendered.pipe(take(1)).subscribe(() => {
 			this.onboardingFinished = false;
 			this.onboardingResult = false;
-			this.showAlert = false;
+			this.showAlert = true;
 			const onboarding = this.onboarding.start({
 				steps: [
 					{
