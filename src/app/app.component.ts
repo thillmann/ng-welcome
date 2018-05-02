@@ -7,7 +7,7 @@ import {
 	AfterViewInit
 } from '@angular/core';
 import { Onboarding } from '../lib/public_api';
-import { Subject } from 'rxjs/Subject';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { takeUntil } from 'rxjs/operators/takeUntil';
 import { switchMap } from 'rxjs/operators/switchMap';
 import { filter } from 'rxjs/operators/filter';
@@ -15,6 +15,28 @@ import { merge } from 'rxjs/observable/merge';
 import { tap } from 'rxjs/operators/tap';
 import * as Chart from 'chart.js';
 import { take } from 'rxjs/operators/take';
+import { Observable } from 'rxjs/Observable';
+
+const points = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((x, i) => ({
+	x: i,
+	y: Math.round(Math.random() * 10000) + 1000
+}));
+
+const DATA = {
+	labels: points.map(x => {
+		const date = new Date();
+		date.setMonth(x.x);
+		return date.toLocaleString('en-us', { month: 'long' });
+	}),
+	datasets: [
+		{
+			label: 'Revenue',
+			data: points,
+			borderColor: 'rgb(0, 123, 255)',
+			backgroundColor: 'rgb(0, 123, 255, 0.25)'
+		}
+	]
+};
 
 @Component({
 	selector: 'ng-root',
@@ -22,68 +44,58 @@ import { take } from 'rxjs/operators/take';
 	styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
-	private chartRendered = new Subject<void>();
+	private chartRendered = new ReplaySubject<boolean>(1);
 
-	clicked = new Subject<void>();
+	onboardingFinished = false;
+	onboardingResult = false;
+	showAlert = true;
 
 	@ViewChild('chart') chartRef: ElementRef;
+	@ViewChild('sidebar') sidebarRef: ElementRef;
 	@ViewChild('step1') step1Ref: TemplateRef<any>;
 	@ViewChild('step2') step2Ref: TemplateRef<any>;
+	@ViewChild('step3') step3Ref: TemplateRef<any>;
+	@ViewChild('step4') step4Ref: TemplateRef<any>;
 
 	constructor(private onboarding: Onboarding, private viewContainerRef: ViewContainerRef) {}
 
 	ngAfterViewInit(): void {
 		const ctx = this.chartRef.nativeElement.getContext('2d');
 		const chart = new Chart(ctx, {
-			type: 'bar',
-			data: {
-				labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-				datasets: [
-					{
-						label: '# of Votes',
-						data: [12, 19, 3, 5, 2, 3],
-						backgroundColor: [
-							'rgba(255, 99, 132, 0.2)',
-							'rgba(54, 162, 235, 0.2)',
-							'rgba(255, 206, 86, 0.2)',
-							'rgba(75, 192, 192, 0.2)',
-							'rgba(153, 102, 255, 0.2)',
-							'rgba(255, 159, 64, 0.2)'
-						],
-						borderColor: [
-							'rgba(255,99,132,1)',
-							'rgba(54, 162, 235, 1)',
-							'rgba(255, 206, 86, 1)',
-							'rgba(75, 192, 192, 1)',
-							'rgba(153, 102, 255, 1)',
-							'rgba(255, 159, 64, 1)'
-						],
-						borderWidth: 1
-					}
-				]
-			},
+			type: 'line',
+			data: DATA,
 			options: {
 				animation: {
 					onComplete: () => {
-						this.chartRendered.next();
+						this.chartRendered.next(true);
 					}
 				},
-				scales: {
-					yAxes: [
-						{
-							ticks: {
-								beginAtZero: true
-							}
-						}
-					]
-				}
+				responsive: false
 			}
 		});
 		this.start();
 	}
 
 	start(): void {
+		const clicked$ = () => {
+			return Observable.create(observer => {
+				const links = this.sidebarRef.nativeElement.querySelectorAll('.nav-link');
+				const linksArr = [];
+				for (let i = 0; i < links.length; i++) {
+					linksArr.push(links[i]);
+				}
+				const handleClick = event => observer.next(event);
+				linksArr.forEach(link => link.addEventListener('click', handleClick));
+				return () => {
+					linksArr.forEach(link => link.removeEventListener('click', handleClick));
+					observer.complete();
+				};
+			});
+		};
 		this.chartRendered.pipe(take(1)).subscribe(() => {
+			this.onboardingFinished = false;
+			this.onboardingResult = false;
+			this.showAlert = false;
 			const onboarding = this.onboarding.start({
 				steps: [
 					{
@@ -94,34 +106,25 @@ export class AppComponent implements AfterViewInit {
 						attachTo: this.chartRef,
 						position: 'bottom',
 						offsetY: 20
+					},
+					{
+						content: this.step3Ref,
+						attachTo: this.sidebarRef,
+						position: 'right',
+						offsetX: 20,
+						nextWhen: clicked$
+					},
+					{
+						content: this.step4Ref
 					}
 				],
 				viewContainerRef: this.viewContainerRef,
 				disableClose: true
 			});
-			onboarding.afterOpen$().subscribe(() => {
-				console.warn('Onboarding started');
-			});
 			onboarding.afterClosed$().subscribe(result => {
-				if (result) {
-					console.warn('Finished onboarding');
-				} else {
-					console.warn('Skipped onboarding');
-				}
+				this.onboardingResult = !!result;
+				this.onboardingFinished = true;
 			});
-			onboarding
-				.afterNext$()
-				.pipe(
-					filter(idx => idx === 1),
-					switchMap(() =>
-						this.clicked
-							.asObservable()
-							.pipe(
-								takeUntil(merge(onboarding.afterNext$(), onboarding.beforeClose$()))
-							)
-					)
-				)
-				.subscribe(() => onboarding.next());
 		});
 	}
 }
