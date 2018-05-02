@@ -342,6 +342,10 @@
     <button tabindex="1" type="button" class="btn btn-link" (click)="onboarding.close()">Skip</button>
   </p>
 </ng-template>
-<ngb-alert type="info" [dismissible]="true" class="finished-alert" (close)="showAlert = false" *ngIf="onboardingResult && showAlert">
-  <strong>Finished</strong> Enjoy the product!
+<ngb-alert [type]="onboardingResult ? 'info' : 'warning'" [dismissible]="true" class="finished-alert" (close)="showAlert = false"
+  *ngIf="onboardingFinished && showAlert">
+  <ng-container *ngIf="onboardingResult">
+    <strong>Finished!</strong> User finished the onboarding process!</ng-container>
+  <ng-container *ngIf="!onboardingResult">
+    <strong>Warning!</strong> User skipped the onboarding process!</ng-container>
 </ngb-alert>
